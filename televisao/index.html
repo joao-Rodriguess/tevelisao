@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Interativa com Câmera</title>
+    <meta name="description" content="Sistema interativo de TV controlado por gestos das mãos usando câmera">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>TV Interativa com Gestos</h1>
+        <p class="instructions">👍 Próximo | 👎 Anterior | ✌️ Play/Pause | ✊ Arrastar (Vídeo) | ✌️+✌️(2 mãos) Modo
+            Noturno</p>
+
+        <div class="tv-frame">
+            <div class="tv-screen">
+                <!-- Camera feed will be displayed here -->
+                <video id="cameraFeed" autoplay playsinline></video>
+
+                <!-- Video player for direct video files -->
+                <video id="videoPlayer" class="hidden" controls></video>
+
+                <!-- Video Controls Overlay -->
+                <div id="videoControls" class="video-controls hidden">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-filled"></div>
+                        </div>
+                        <div class="progress-handle"></div>
+                    </div>
+                    <div class="controls-row">
+                        <div class="left-controls">
+                            <button id="playPauseBtn" class="control-btn">
+                                <span class="icon-play">▶</span>
+                                <span class="icon-pause hidden">⏸</span>
+                            </button>
+                            <div class="time-display">
+                                <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+                            </div>
+                        </div>
+                        <div class="right-controls">
+                            <button id="fullscreenBtn" class="control-btn">⛶</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gesture Cursor -->
+                <div id="gestureCursor" class="gesture-cursor hidden"></div>
+
+                <!-- iFrame for web-based video players -->
+                <iframe id="iframePlayer" class="hidden" frameborder="0" allowfullscreen></iframe>
+
+                <!-- Canvas for hand detection visualization -->
+                <canvas id="handCanvas"></canvas>
+
+                <!-- Status overlay -->
+                <div id="statusOverlay" class="status-overlay">
+                    <div class="status-content">
+                        <div class="loading-spinner"></div>
+                        <p id="statusText">Iniciando câmera...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TV Controls -->
+            <div class="tv-controls">
+                <div class="control-button power" id="powerBtn">
+                    <span>⏻</span>
+                </div>
+                <div class="channel-display">
+                    <span id="channelNumber">1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gesture indicator -->
+        <div id="gestureIndicator" class="gesture-indicator hidden">
+            <span>🤏 Pinça Detectada!</span>
+        </div>
+
+        <!-- Channel list -->
+        <div class="channel-list">
+            <h2>Canais Disponíveis</h2>
+            <div id="channelGrid" class="channel-grid">
+                <!-- Channels will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MediaPipe Hands -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <script src="gestureRecognizer.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

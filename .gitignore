@@ -1,0 +1,9 @@
+# Media
+*.mp4
+*.webm
+*.avi
+*.mov
+# Dependencies
+node_modules/
+# Logs
+*.log
