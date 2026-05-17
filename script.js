@@ -60,13 +60,13 @@ class TVSystem {
         // Channels
         this.channels = [
             { name: "Canal da Câmera", description: "Visualização ao vivo da câmera", type: "camera" },
-            { name: "Black Clover", description: "2ª Temporada - Trailer Oficial", type: "video", url: "videos/Black Clover 2ª Temporada  TRAILER OFICIAL - Crunchyroll Brasil (720p, h264, youtube).mp4" },
-            { name: "Hunter x Hunter", description: "Netero e Zeno vs Pitou - Entrada Épica", type: "video", url: "videos/Entrada Épica Netero e Zeno - Netero vs Pitou - Hunter x Hunter - Escanor Animes (720p, h264, youtube).mp4" },
-            { name: "JoJo's Bizarre Adventure", description: "Jotaro vs DIO - Batalha Final", type: "video", url: "videos/JOTARO VS DIO - J Isaacs (720p, h264, youtube).mp4" },
-            { name: "Naruto Shippuden", description: "Sasuke vs Itachi AMV - In The End", type: "video", url: "videos/Sasuke vs Itachi AMV- linkin park-in the end - odst123456 (360p, h264, youtube).mp4" },
-            { name: "Solo Leveling", description: "Sung Jinwoo vs Rei Formiga - 2ª Temporada", type: "video", url: "videos/Sung Jinwoo vs. O Rei Formiga 🔥  Solo Leveling 2ª Temporada -Ergam-se das Sombras- - Crunchyroll Brasil (720p, h264, youtube).mp4" },
-            { name: "Naruto: O Filme", description: "Akatsuki Dublado 2020", type: "video", url: "videos/NARUTO O FILME AKATSUKI DUBLADO 2020 - Games Lopes 2 (480p, h264, youtube).mp4" },
-            { name: "Naruto Clássico", description: "Sasuke vs Gaara - Exame Chunin", type: "video", url: "videos/Sasuke usa Sharingan e acerta Gaara com chidori - Naruto vs Neji -  Sasuke vs Gaara  Naruto - Otaku Safadão (720p, h264, youtube).mp4" }
+            { name: "Naruto Shippuden OP 16", description: "Silhouette - KANA-BOON", type: "iframe", url: "https://www.youtube.com/embed/k626C7256V4?autoplay=1&mute=0" },
+            { name: "Attack on Titan OP 7", description: "The Rumbling - SiM (Creditless)", type: "iframe", url: "https://www.youtube.com/embed/0P7nCslcaQ0?autoplay=1&mute=0" },
+            { name: "Chainsaw Man OP 1", description: "KICK BACK - Kenshi Yonezu", type: "iframe", url: "https://www.youtube.com/embed/MvezH6085_k?autoplay=1&mute=0" },
+            { name: "Jujutsu Kaisen OP 1", description: "Kaikai Kitan - Eve (Creditless)", type: "iframe", url: "https://www.youtube.com/embed/19Y1374ave0?autoplay=1&mute=0" },
+            { name: "Black Clover OP 10", description: "Black Catcher - Vickeblanka", type: "iframe", url: "https://www.youtube.com/embed/o-Yd-q9s1t8?autoplay=1&mute=0" },
+            { name: "Demon Slayer OP 1", description: "Gurenge - LiSA", type: "iframe", url: "https://www.youtube.com/embed/4DxL6IKmDx4?autoplay=1&mute=0" },
+            { name: "One Piece OP 1", description: "We Are! - Hiroshi Kitadani (Clássico)", type: "iframe", url: "https://www.youtube.com/embed/1Mc6aZ7H4fE?autoplay=1&mute=0" }
         ];
         this.init();
     }
@@ -419,6 +419,7 @@ class TVSystem {
         this.iframePlayer.classList.add('hidden');
         this.videoControls.classList.add('hidden');
         this.videoPlayer.pause();
+        this.iframePlayer.src = '';
         if (channel.type === 'camera') {
             this.cameraFeed.classList.remove('hidden');
         } else if (channel.type === 'video') {
