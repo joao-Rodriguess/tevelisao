@@ -60,13 +60,13 @@ class TVSystem {
         // Channels
         this.channels = [
             { name: "Canal da Câmera", description: "Visualização ao vivo da câmera", type: "camera" },
-            { name: "Naruto Shippuden OP 16", description: "Silhouette - KANA-BOON", type: "iframe", url: "https://www.youtube.com/embed/k626C7256V4?autoplay=1&mute=0" },
-            { name: "Attack on Titan OP 7", description: "The Rumbling - SiM (Creditless)", type: "iframe", url: "https://www.youtube.com/embed/0P7nCslcaQ0?autoplay=1&mute=0" },
-            { name: "Chainsaw Man OP 1", description: "KICK BACK - Kenshi Yonezu", type: "iframe", url: "https://www.youtube.com/embed/MvezH6085_k?autoplay=1&mute=0" },
-            { name: "Jujutsu Kaisen OP 1", description: "Kaikai Kitan - Eve (Creditless)", type: "iframe", url: "https://www.youtube.com/embed/19Y1374ave0?autoplay=1&mute=0" },
-            { name: "Black Clover OP 10", description: "Black Catcher - Vickeblanka", type: "iframe", url: "https://www.youtube.com/embed/o-Yd-q9s1t8?autoplay=1&mute=0" },
-            { name: "Demon Slayer OP 1", description: "Gurenge - LiSA", type: "iframe", url: "https://www.youtube.com/embed/4DxL6IKmDx4?autoplay=1&mute=0" },
-            { name: "One Piece OP 1", description: "We Are! - Hiroshi Kitadani (Clássico)", type: "iframe", url: "https://www.youtube.com/embed/1Mc6aZ7H4fE?autoplay=1&mute=0" }
+            { name: "Naruto Shippuden OP 16", description: "Silhouette - KANA-BOON (Sem Legenda)", type: "video", searchName: "Naruto: Shippuden", themeType: "OP", sequence: 16, fallbackUrl: "https://v.animethemes.moe/NarutoShippuuden-OP16.webm" },
+            { name: "Attack on Titan OP 7", description: "The Rumbling - SiM (Sem Legenda)", type: "video", searchName: "Shingeki no Kyojin: The Final Season Part 2", themeType: "OP", sequence: 1, fallbackUrl: "https://v.animethemes.moe/ShingekiNoKyojinS4Part2-OP1.webm" },
+            { name: "Chainsaw Man OP 1", description: "KICK BACK - Kenshi Yonezu", type: "video", searchName: "Chainsaw Man", themeType: "OP", sequence: 1, fallbackUrl: "https://v.animethemes.moe/ChainsawMan-OP1.webm" },
+            { name: "Jujutsu Kaisen OP 1", description: "Kaikai Kitan - Eve (Sem Legenda)", type: "video", searchName: "Jujutsu Kaisen", themeType: "OP", sequence: 1, fallbackUrl: "https://v.animethemes.moe/JujutsuKaisen-OP1.webm" },
+            { name: "Black Clover OP 10", description: "Black Catcher - Vickeblanka", type: "video", searchName: "Black Clover", themeType: "OP", sequence: 10, fallbackUrl: "https://v.animethemes.moe/BlackClover-OP10.webm" },
+            { name: "Demon Slayer OP 1", description: "Gurenge - LiSA", type: "video", searchName: "Kimetsu no Yaiba", themeType: "OP", sequence: 1, fallbackUrl: "https://v.animethemes.moe/KimetsuNoYaiba-OP1.webm" },
+            { name: "One Piece OP 1", description: "We Are! - Hiroshi Kitadani (Clássico)", type: "video", searchName: "One Piece", themeType: "OP", sequence: 1, fallbackUrl: "https://v.animethemes.moe/OnePiece-OP1.webm" }
         ];
         this.init();
     }
@@ -75,8 +75,33 @@ class TVSystem {
         this.renderChannelList();
         this.setupEventListeners();
         this.setupVideoControls();
-        await this.setupCamera();
-        await this.setupHandDetection();
+        try {
+            await this.setupCamera();
+            await this.setupHandDetection();
+        } catch (error) {
+            console.warn('Falha na inicialização do hardware de gestos/webcam. Ativando Modo Manual elegante...', error);
+            
+            // Substitui o canal de câmera inoperante por uma abertura icônica de Evangelion
+            this.channels[0] = { 
+                name: "Evangelion OP 1", 
+                description: "A Cruel Angel's Thesis - Yoko Takahashi (Modo Manual)", 
+                type: "video", 
+                searchName: "Neon Genesis Evangelion", 
+                themeType: "OP", 
+                sequence: 1, 
+                fallbackUrl: "https://v.animethemes.moe/NeonGenesisEvangelion-OP1.webm" 
+            };
+            
+            this.renderChannelList();
+            this.statusText.textContent = 'Modo de Controle Manual Ativo (Sem Câmera)';
+            
+            setTimeout(() => {
+                this.statusOverlay.classList.add('hidden');
+                this.tvOn = true;
+                // Sintoniza no canal padrão inicial
+                this.switchChannel(0);
+            }, 2500);
+        }
     }
 
     setupEventListeners() {
@@ -189,7 +214,8 @@ class TVSystem {
         } catch (error) {
             console.error('Erro ao acessar câmera:', error);
             this.statusText.textContent = 'Erro ao acessar câmera. Verifique permissões.';
-            alert('Erro ao acessar a câmera. Por favor, verifique se a câmera está conectada e se você deu permissão de acesso.');
+            alert('Aviso: Câmera não encontrada ou acesso negado. A TV funcionará no Modo Manual por cliques.');
+            throw error; // Permite que a rotina init() faça a transição para o Modo Manual
         }
     }
 
@@ -207,6 +233,7 @@ class TVSystem {
         } catch (error) {
             console.error('Erro ao inicializar detecção de mãos:', error);
             this.statusText.textContent = 'Erro ao carregar detecção de gestos.';
+            throw error; // Permite que a rotina init() faça a transição para o Modo Manual
         }
     }
 
@@ -409,27 +436,82 @@ class TVSystem {
         setTimeout(() => indicator.remove(), 1000);
     }
 
+    async resolveAnimeThemeUrl(animeName, themeType = "OP", sequence = 1) {
+        // Consulta o banco de dados da API pública do AnimeThemes (CORS habilitado)
+        const queryUrl = `https://api.animethemes.moe/anime?filter[name]=${encodeURIComponent(animeName)}&include=animethemes.animethemeentries.videos`;
+        try {
+            const res = await fetch(queryUrl);
+            const data = await res.json();
+            if (data && data.anime && data.anime.length > 0) {
+                const anime = data.anime[0];
+                if (anime.animethemes) {
+                    const theme = anime.animethemes.find(t => t.type === themeType && t.sequence === sequence);
+                    if (theme && theme.animethemeentries && theme.animethemeentries.length > 0) {
+                        const entry = theme.animethemeentries[0];
+                        if (entry.videos && entry.videos.length > 0) {
+                            return entry.videos[0].link; // Retorna a URL direta do arquivo de vídeo (.webm)
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Falha ao resolver tema via API do AnimeThemes, usando fallback:", error);
+        }
+        return null;
+    }
+
     switchChannel(channelIndex) {
         if (!this.tvOn) return;
         this.currentChannel = channelIndex;
         this.channelNumber.textContent = channelIndex + 1;
         const channel = this.channels[channelIndex];
+        
+        // Esconde todos os players e pausa reproduções atuais
         this.cameraFeed.classList.add('hidden');
         this.videoPlayer.classList.add('hidden');
         this.iframePlayer.classList.add('hidden');
         this.videoControls.classList.add('hidden');
         this.videoPlayer.pause();
         this.iframePlayer.src = '';
+
         if (channel.type === 'camera') {
             this.cameraFeed.classList.remove('hidden');
         } else if (channel.type === 'video') {
             this.videoPlayer.classList.remove('hidden');
-            this.videoPlayer.src = channel.url;
-            this.videoPlayer.play().catch(err => { console.error('Erro ao reproduzir vídeo:', err); this.switchChannel(0); });
+            this.videoControls.classList.remove('hidden');
+            this.statusOverlay.classList.remove('hidden');
+            this.statusText.textContent = "Sintonizando abertura (CDN de Alta Velocidade)...";
+            
+            // Resolve a URL de vídeo de forma assíncrona
+            this.resolveAnimeThemeUrl(channel.searchName, channel.themeType, channel.sequence)
+                .then(url => {
+                    const finalUrl = url || channel.fallbackUrl;
+                    console.log("Sintonizando canal no vídeo:", finalUrl);
+                    this.videoPlayer.src = finalUrl;
+                    
+                    // Garante que o player nativo esteja desmutado
+                    this.videoPlayer.muted = false;
+                    
+                    // Executa o play (retorna uma Promise)
+                    return this.videoPlayer.play();
+                })
+                .then(() => {
+                    this.statusOverlay.classList.add('hidden');
+                    this.iconPlay.classList.add('hidden');
+                    this.iconPause.classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Erro ao reproduzir abertura de anime:', err);
+                    this.statusText.textContent = "Erro de conexão com o canal.";
+                    setTimeout(() => {
+                        this.statusOverlay.classList.add('hidden');
+                    }, 2000);
+                });
         } else if (channel.type === 'iframe') {
             this.iframePlayer.classList.remove('hidden');
             this.iframePlayer.src = channel.url;
         }
+        
         this.renderChannelList();
         this.channelNumber.style.transform = 'scale(1.2)';
         setTimeout(() => this.channelNumber.style.transform = 'scale(1)', 200);
